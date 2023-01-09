@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { addToDb, deleteShoppingCart, getStoredData, removeFromDb } from '../../utilities/fakedb';
 import Cart from '../Cart/Cart';
 import Item from '../Item/Item';
 import "./MainBody.css"
@@ -6,15 +7,42 @@ import "./MainBody.css"
 const MainBody = () => {
     const [items , setItems] = useState([]);
     const [cart ,setCart] = useState([]);
+    console.log(cart)
     useEffect(()=>{
         fetch('items.json')
         .then(res=>res.json())
         .then(data=>setItems(data))
     },[]);
 
+    useEffect(()=>{
+        const storedData = getStoredData();
+        const savedData =[];
+        for(const id in storedData){
+        const addedProduct = items.find(product=> product.id === id)
+        if(addedProduct){
+            const quantity = storedData[id];
+            addedProduct.quantity = quantity;
+            savedData.push(addedProduct);
+        }
+        }
+        setCart(savedData);
+    },[items]);
+
     const handleAddCart = (item)=>{
-    let newCart =[...cart,item];
-    setCart(newCart)
+        let newCart = [];
+        const exists = cart.find(prod => prod.id ===item.id)
+         if(!exists){
+            item.quantity = 1;
+            newCart = [...cart, item]
+         }
+         else{
+            const rest = cart.filter(prod => prod.id !== item.id);
+            exists.quantity = exists.quantity + 1;
+            newCart = [...rest, exists];
+         }
+        
+        setCart(newCart);
+        addToDb(item.id);
     }
 
     const handleChosen =(cart)=>{
@@ -27,12 +55,14 @@ const MainBody = () => {
     const handleClear= ()=>{
         setCart([]);
         document.getElementById("chosed").innerHTML = `Choose Items Again`
+        deleteShoppingCart();
     }
     const handleSelectedCartItem=(id)=>{
         const updatedItem= cart.filter((curElem)=>{
             return curElem.id !== id;
           });
           setCart(updatedItem);
+          removeFromDb(id)
     }
     return (
         <div className='main-body'>
