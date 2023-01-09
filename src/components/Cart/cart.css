@@ -1,0 +1,26 @@
+.cart-img img{
+width: 50px;
+height: 50px;
+border-radius: 50%;
+
+}
+.cart-img {
+ padding-top: 15px;
+ padding-left: 15px;
+}
+.each-cart-item{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid black;
+    margin-top: 5px;
+}
+.cart-item-name{
+    font-weight: bold;
+}
+.each-delete:hover {
+    cursor: pointer;
+    color: rgb(253, 5, 5);
+}
+.each-delete{
+    margin: auto;
+}
